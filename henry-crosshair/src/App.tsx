@@ -9,7 +9,8 @@ function App() {
   return (
 
       <div>
-        <MainPage/>
+        {/* <MainPage/> */}
+        <AdminDashboard/>
       </div>
 
   )
