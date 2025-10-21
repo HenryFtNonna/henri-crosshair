@@ -12,7 +12,8 @@ export default function Navbar() {
         transition={{ duration: 0.3 }}
         className="btn bg-blue-600 text-xl text-white"
       >
-        Login <FontAwesomeIcon icon={faArrowRight} className="ml-0" /> 
+        {/* Login  */}
+        <FontAwesomeIcon icon={faArrowRight} className="ml-0" /> 
       </motion.button>
     </div>
   );
