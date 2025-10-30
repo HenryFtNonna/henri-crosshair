@@ -1,78 +1,84 @@
-import React, { createContext, useEffect, useState, useContext } from "react";
-import { supabase } from "../lib/SupabaseClient";
-import type { Session, User } from "@supabase/supabase-js";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY!;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-type AuthContextType = {
-  user: User | null;
-    session: Session | null;
-    loading: boolean;
-    signIn: (email: string, password: string) => Promise<{ error ? : Error}>;
-    signOut: () => Promise<void>;
-};
+interface AuthContextType {
+  user: any;
+  session: any;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<{ error?: Error | null }>;
+  signInWithEmailLink: (email: string) => Promise<{ error?: Error | null }>;
+  signOut: () => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null > (null);
-    const [session, setSession] = useState<Session | null > (null);
-    const [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        let mounted = true;
-
-        supabase.auth.getSession().then(({ data }) => {
-            if (!mounted) return;
-            const session = data?.session ?? null;
-            setSession(session ?? null);
-            setUser(session?.user ?? null);
-            setLoading(false);
-        }); 
-
-        const { data: listener } = supabase.auth.onAuthStateChange((_event, data) => { 
-                const session = data?.session ?? null;
-                setSession(session);
-                setUser(session?.user ?? null);
-        });
-
-        return () => {
-            mounted = false;
-            listener.subscription.unsubscribe?.();
-        };
-    }, []);
-
-    const signIn = async (email: string, password: string) => {
-        setLoading(true);
-        const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-        setLoading(false);
-        if (data?.user) {
-            setUser(data.user);
-            setSession(data.session ?? null);
-        }
-            return { error }
-        };
-
-    const signOut = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        setSession(null);
+  useEffect(() => {
+    const initSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      setLoading(false);
     };
 
-            useEffect(() => {
-        console.log("Session changed:", session);
-        console.log("User changed:", user);
-        }, [session, user]);
+    initSession();
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+    //   console.log('Session changed:', session);
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) navigate('/admin');
+    });
 
-    return (
-        <AuthContext.Provider value={{ user, session, loading, signIn, signOut }}>
-            {children}
-        </AuthContext.Provider>
-    );
-}; 
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const signIn = async (email: string, password: string) => {
+    // console.log('Attempting signIn with:', { email });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // console.log('supabase.signInWithPassword result:', { data, error });
+    return { error };
+  };
+
+  const signInWithEmailLink = async (email: string) => {
+    console.log('Sending magic link to:', email);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/admin`,
+      },
+    });
+    // if (error) console.error('Magic link error:', error);
+    return { error };
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, session, loading, signIn, signInWithEmailLink, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 export const useAuth = () => {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
-    return ctx;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
 };
