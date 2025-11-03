@@ -1,46 +1,34 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Navbar() {
-  const { user, signOut } = useAuth();
-  const location = useLocation();
+  const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleClick = async () => {
     if (user) {
-      // kalo udah login → logout
       await signOut();
-      navigate('/');
     } else {
-      // kalo belum login → ke /login
       navigate('/login');
     }
   };
 
   return (
-    <div className="fixed navbar bg-gray-100 w-full px-8 py-4 flex justify-end drop-shadow-2xl">
-      <motion.button
-        whileTap={{ scale: 0.95 }}
-        transition={{ duration: 0.3 }}
-        onClick={handleClick}
-        className={`btn flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition`}
-      >
-        {user ? (
-          <>
-            <span>Logout</span>
-            {/* <FontAwesomeIcon icon={faRightFromBracket} /> */}
-          </>
-        ) : (
-          <>
-            <span>Login</span>
-            {/* <FontAwesomeIcon icon={faArrowRight} /> */}
-          </>
-        )}
-      </motion.button>
+    <div className="fixed navbar bg-gray-100/30 w-full px-5 py-4 flex justify-between drop-shadow-3xl z-50">
+      <p className='flex flex-col justify-items-start text-2xl'></p> 
+      {/* <img src={TextLogo} style={{width: 400}}/> */}
+      {!loading && (
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.3 }}
+          onClick={handleClick}
+          className="btn flex items-end justify-end gap-2 bg-blue-800 text-white px-4 py-2 rounded-r-lg font-medium hover:bg-blue-900 transition"
+        >
+          <span>{user ? 'Logout' : 'Login'}</span>
+        </motion.button>
+      )}
     </div>
   );
 }

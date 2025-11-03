@@ -36,7 +36,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 ">
+    // className="min-h-screen flex flex-col   text-gray-900 px-6 py-6 pt-24"
+    <div className="min-h-screen flex items-center justify-center bg-white/5 px-4 ">
       <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-sm ">
         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 ">
           {mode === 'password' ? 'Sign in' : 'Login with Magic Link'}
