@@ -94,7 +94,7 @@ export default function MainPage() {
           ) : (
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-5 gap-4">
               {list.map((c) => (
-                <div key={c.id} className="card bg-base-100 drop-shadow-xl rounded-lg overflow-hidden p-4 ">
+                <div key={c.id} className="card bg-white drop-shadow-xl rounded-lg overflow-hidden p-4">
                   <div className="h-40 bg-[url(./assets/images/default.webp)] flex items-center justify-center overflow-hidden ">
                     {c.image_path ? (
                       // if image_path is a path (not full URL) and bucket is private,
