@@ -10,6 +10,8 @@ type AuthContextType = {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
+  signInWithEmail: (email: string) => Promise<{ error?: any }>;
+  signInWithEmailLink?: (email: string) => Promise<{  error?: any }>; 
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,6 +67,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const signInWithEmail = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({ 
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + '/admin',
+      },
+     });
+    return { error };
+
+    };
+
+  const signInWithEmailLink = async (email: string) => {
+    return signInWithEmail(email);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -73,7 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signOut }}>
+    <AuthContext.Provider 
+      value = {{ user, session, loading, signIn, signOut, signInWithEmail, signInWithEmailLink }} >
       {children}
     </AuthContext.Provider>
   );

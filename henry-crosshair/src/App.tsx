@@ -1,10 +1,8 @@
 // henry-crosshair/src/App.tsx
-import React from "react";
 import { Route, Routes } from "react-router-dom"
 import Login from "./pages/Login"
 import MainPage from "./pages/MainPage" 
 import AdminDashboard from "./pages/AdminDashboard"
-import Navbar from "./components/layout/NavBar"
 import { RequireAdmin } from "./components/RequireAuth"
 import { AuthProvider } from "./context/AuthContext"
 import BG from "./assets/images/cypher.jpg"
