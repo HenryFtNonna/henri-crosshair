@@ -23,7 +23,7 @@ export default function Navbar() {
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.3 }}
           onClick={handleClick}
-          className="btn flex items-end justify-end gap-2 bg-blue-800 text-white px-4 py-2 rounded-r-lg font-medium hover:bg-blue-900 transition"
+          className="btn flex items-end justify-end gap-2 bg-blue-800 text-white px-4 py-2 border-0 rounded-r-lg font-medium hover:bg-blue-900 transition"
         >
           <span>{user ? 'Logout' : 'Login'}</span>
         </motion.button>
