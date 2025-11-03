@@ -16,8 +16,8 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed navbar bg-gray-100/30 w-full px-5 py-4 flex justify-between drop-shadow-3xl z-50">
-      <p className='flex flex-col justify-items-start text-2xl'></p> 
+    <div className="fixed navbar bg-gray-100/30 w-full px-6 py-4 flex justify-between drop-shadow-3xl z-50">
+      <p className='flex flex-col justify-items-start text-2xl font-mono font-bold'>Valorant Pros Crosshair</p> 
       {/* <img src={TextLogo} style={{width: 400}}/> */}
       {!loading && (
         <motion.button
