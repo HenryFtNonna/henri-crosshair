@@ -4,7 +4,7 @@ import Navbar from '../components/layout/NavBar';
 import { motion } from 'motion/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faXmark, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { supabase } from '../lib/SupabaseClient'; // <-- PASTIKAN ini adalah satu-satunya createClient di project
+import { supabase } from '../lib/SupabaseClient'; 
 
 type Crosshair = {
   id: string;
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'crosshairs' },
-        (payload) => {
+        () => {
           // console.log('Realtime payload:', payload);
           fetchCrosshairs();
         }
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
     return () => {
       channel.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []);
 
   async function fetchCrosshairs() {
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
     setErrorMsg(null);
     try {
       const { data, error } = await supabase
-        .from<Crosshair>('crosshairs')
+        .from('crosshairs')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
     }
   }
 
-  const openModal = () => setShowModal(true);
+  // const openModal = () => setShowModal(true);
   const closeModal = () => {
     setShowModal(false);
     // reset form
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
 
     // console.log('Uploading file:', { name: file.name, size: file.size, type: file.type, filePath });
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const {  error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(filePath, file, { cacheControl: '3600', upsert: false });
 
@@ -120,18 +120,18 @@ export default function AdminDashboard() {
     // console.log('storage.upload success', uploadData);
 
     // Try to get public URL first
-    const { data: publicUrlData, error: publicUrlError } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
-    if (publicUrlError) {
-      console.warn('getPublicUrl error', publicUrlError);
-    } else {
+    const { data: publicUrlData } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
+    // if (publicUrlError) {
+    //   console.warn('getPublicUrl error', publicUrlError);
+    // } else {
       // If the bucket is public, this publicUrl will be usable immediately
-      const publicUrl = (publicUrlData as any).publicUrl;
+      const publicUrl = publicUrlData.publicUrl;
       // console.log('getPublicUrl', publicUrl);
       // Some setups might return a URL even if bucket private — might not be accessible without signed url.
       if (publicUrl && !publicUrl.includes('null')) {
         return publicUrl;
       }
-    }
+    
 
     // If bucket private or publicUrl not usable, try createSignedUrl (if allowed)
     if (USE_SIGNED_URL_FOR_PRIVATE_BUCKETS) {
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
 
       // console.log('Inserting crosshair', { name, code, imageUrl });
 
-      const { data: insertData, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('crosshairs')
         .insert({ crosshair_name: name, crosshair_code: code, image_path: imageUrl })
         .select()

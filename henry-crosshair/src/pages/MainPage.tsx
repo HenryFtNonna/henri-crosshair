@@ -1,5 +1,5 @@
 // src/pages/MainPage.tsx
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import Navbar from '../components/layout/NavBar';
 import { supabase } from '../lib/SupabaseClient';
 import { motion } from 'motion/react';
@@ -25,7 +25,7 @@ export default function MainPage() {
       setError(null);
       try {
         const { data, error } = await supabase
-          .from<Crosshair>('crosshairs')
+          .from('crosshairs')
           .select('*')
           .order('created_at', { ascending: false });
 

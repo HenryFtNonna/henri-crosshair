@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'motion/react';
 
 export default function Login() {
-  const { signIn, signInWithEmailLink } = useAuth();
+  const { signIn, signInWithEmail, signInWithEmailLink } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState<'password' | 'magic'>('password');
@@ -17,15 +17,22 @@ export default function Login() {
     setErrorMsg('');
     setLoading(true);
 
+    
+
     try {
       if (mode === 'password') {
         const { error } = await signIn(email, password);
         if (error) throw error;
         navigate('/admin');
       } else {
-        const { error } = await signInWithEmailLink(email);
-        if (error) throw error;
-        alert('Check your email for the login link!');
+        const passwordlessSignIn = signInWithEmailLink ?? signInWithEmail;
+        if (!passwordlessSignIn) {
+          setErrorMsg('Passwordless login is not configured.');
+          return;
+        }
+        const result = await passwordlessSignIn(email);
+        if (result.error) throw result.error;
+        setErrorMsg('Magic link sent! Check your email.');
       }
     } catch (error: any) {
       console.error('Login failed:', error);
